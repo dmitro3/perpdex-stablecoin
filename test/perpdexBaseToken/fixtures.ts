@@ -43,7 +43,6 @@ export function createPerpdexTokenBaseFixture(): (wallets, provider) => Promise<
             ethers.constants.AddressZero,
         )) as TestPerpdexMarket
 
-        await perpdexMarket.connect(owner).setPoolFeeRatio(0)
         await perpdexMarket.connect(owner).setFundingMaxPremiumRatio(0)
 
         // test token
