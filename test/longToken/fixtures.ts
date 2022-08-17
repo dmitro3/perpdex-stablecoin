@@ -107,7 +107,11 @@ export function createPerpdexExchangeFixture(
         )) as TestPerpdexMarket
 
         await perpdexMarket.connect(owner).setFundingMaxPremiumRatio(0)
-
+        await perpdexMarket.setPoolFeeConfig({
+            fixedFeeRatio: 0,
+            atrFeeRatio: 0,
+            atrEmaBlocks: 1,
+        })
         // long token
         const perpdexLongTokenF = await ethers.getContractFactory("PerpdexLongToken")
         const perpdexLongToken = (await perpdexLongTokenF.deploy(

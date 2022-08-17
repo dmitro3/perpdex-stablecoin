@@ -84,6 +84,11 @@ export function createPerpdexTokenBaseFixture(): (wallets, provider) => Promise<
         )) as TestPerpdexMarket
 
         await perpdexMarket.connect(owner).setFundingMaxPremiumRatio(0)
+        await perpdexMarket.setPoolFeeConfig({
+            fixedFeeRatio: 0,
+            atrFeeRatio: 0,
+            atrEmaBlocks: 1,
+        })
 
         // test token
         const perpdexTokenBaseF = await ethers.getContractFactory("TestPerpdexTokenBase")
