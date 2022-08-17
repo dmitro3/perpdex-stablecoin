@@ -103,8 +103,8 @@ describe("PerpdexLongToken withdrawETH", async () => {
                         caller: "alice",
                         owner: "alice",
                         receiver: "alice",
-                        revertedWithPreview: "PL_SD: output is zero",
-                        revertedWith: "PL_SD: output is zero",
+                        burnedSharesPreview: "0",
+                        revertedWith: "VL_W: zero amount",
                     },
                     {
                         title: "withdraw reverts and preview succeeds when assets is more than max",

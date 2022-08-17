@@ -138,7 +138,11 @@ describe("PerpdexLongToken depositETH", async () => {
 
                         // assert
                         if (test.revertedWith !== void 0) {
-                            await expect(previewSubject).to.be.reverted
+                            if (test.depositAssets === "0") {
+                                expect(await previewSubject).to.eq(0)
+                            } else {
+                                await expect(previewSubject).to.be.reverted
+                            }
                             await expect(depositSubject).to.revertedWith(test.revertedWith)
                         } else {
                             var mintedShares = parseShares(test.mintedShares)

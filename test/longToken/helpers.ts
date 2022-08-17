@@ -9,6 +9,11 @@ export async function initPool(fixture, base, quote, baseBalancePerShareX96 = vo
     let priceFeedBase = fixture.priceFeedBase
 
     await market.connect(owner).setFundingMaxPremiumRatio(0)
+    await market.setPoolFeeConfig({
+        fixedFeeRatio: 0,
+        atrFeeRatio: 0,
+        atrEmaBlocks: 1,
+    })
     await exchange.connect(owner).setIsMarketAllowed(market.address, true)
 
     await exchange.setAccountInfo(

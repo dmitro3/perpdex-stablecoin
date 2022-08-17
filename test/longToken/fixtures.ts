@@ -46,8 +46,38 @@ export function createPerpdexExchangeFixture(
         let baseDecimals = 18
 
         // exchange
+        const accountLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/AccountLibrary.sol:AccountLibrary",
+        )
+        const accountLibrary = await accountLibraryFactory.deploy()
+        const makerOrderBookLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/MakerOrderBookLibrary.sol:MakerOrderBookLibrary",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                },
+            },
+        )
+        const makerOrderBookLibrary = await makerOrderBookLibraryFactory.deploy()
+        const vaultLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/VaultLibrary.sol:VaultLibrary",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                },
+            },
+        )
+        const vaultLibrary = await vaultLibraryFactory.deploy()
+
         const perpdexExchangeFactory = await ethers.getContractFactory(
             "contracts/test/TestPerpdexExchange.sol:TestPerpdexExchange",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                    MakerOrderBookLibrary: makerOrderBookLibrary.address,
+                    VaultLibrary: vaultLibrary.address,
+                },
+            },
         )
         const perpdexExchange = (await perpdexExchangeFactory.deploy(settlementTokenAddress)) as TestPerpdexExchange
 
@@ -57,8 +87,17 @@ export function createPerpdexExchangeFixture(
         await priceFeedBase.mock.decimals.returns(12)
 
         // market
+        const orderBookLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/OrderBookLibrary.sol:OrderBookLibrary",
+        )
+        const orderBookLibrary = await orderBookLibraryFactory.deploy()
         const perpdexMarketFactory = await ethers.getContractFactory(
             "contracts/test/TestPerpdexMarket.sol:TestPerpdexMarket",
+            {
+                libraries: {
+                    OrderBookLibrary: orderBookLibrary.address,
+                },
+            },
         )
         const perpdexMarket = (await perpdexMarketFactory.deploy(
             "USD",
@@ -67,9 +106,12 @@ export function createPerpdexExchangeFixture(
             ethers.constants.AddressZero,
         )) as TestPerpdexMarket
 
-        await perpdexMarket.connect(owner).setPoolFeeRatio(0)
         await perpdexMarket.connect(owner).setFundingMaxPremiumRatio(0)
-
+        await perpdexMarket.setPoolFeeConfig({
+            fixedFeeRatio: 0,
+            atrFeeRatio: 0,
+            atrEmaBlocks: 1,
+        })
         // long token
         const perpdexLongTokenF = await ethers.getContractFactory("PerpdexLongToken")
         const perpdexLongToken = (await perpdexLongTokenF.deploy(
