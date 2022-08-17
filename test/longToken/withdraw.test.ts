@@ -122,9 +122,7 @@ describe("PerpdexLongToken withdraw", async () => {
                         // alice deposits
                         await weth.connect(owner).mint(alice.address, parseAssets(test.depositAssets))
 
-                        var depositAssets = parseAssets(test.depositAssets)
                         if (test.pool.base !== "0" && test.depositAssets !== "0") {
-                            var depositAssets = parseAssets(test.depositAssets)
                             var owner_ = alice
                             await weth.connect(owner).mint(alice.address, parseAssets(test.depositAssets))
                             await longToken.connect(owner_).deposit(parseAssets(test.depositAssets), owner_.address)
@@ -188,8 +186,8 @@ describe("PerpdexLongToken withdraw", async () => {
                         caller: "alice",
                         owner: "alice",
                         receiver: "alice",
-                        revertedWithPreview: "PL_SD: output is zero",
-                        revertedWith: "PL_SD: output is zero",
+                        burnedSharesPreview: "0",
+                        revertedWith: "VL_W: zero amount",
                     },
                     {
                         title: "withdraw reverts and preview succeeds when assets is more than max",
@@ -281,7 +279,6 @@ describe("PerpdexLongToken withdraw", async () => {
                         var receiver = toWallet(test.receiver)
 
                         // owner_ deposit
-                        var depositAssets = parseAssets(test.depositAssets)
                         await weth.connect(owner).mint(owner_.address, parseAssets(test.depositAssets))
                         await longToken.connect(owner_).deposit(parseAssets(test.depositAssets), owner_.address)
 
@@ -311,7 +308,7 @@ describe("PerpdexLongToken withdraw", async () => {
                             // preview
                             if (test.revertedWithPreview !== void 0) {
                                 await expect(previewSubject).to.revertedWith(test.revertedWithPreview)
-                            } else {
+                            } else if (test.burnedSharesPreview !== void 0) {
                                 expect(await previewSubject).to.equal(parseShares(test.burnedSharesPreview))
                             }
                             // withdraw
