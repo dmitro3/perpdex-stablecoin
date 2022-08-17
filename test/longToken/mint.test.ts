@@ -132,14 +132,14 @@ describe("PerpdexLongToken mint", async () => {
                         revertedWith: "PM_PS: too large amount",
                     },
                     {
-                        title: "reverts when assets is zero",
+                        title: "returns 0 when assets is zero",
                         pool: {
                             base: "10",
                             quote: "10",
                         },
                         aliceQuoteAssets: "1000",
                         mintShares: "0",
-                        revertedWith: "PL_SD: output is zero",
+                        depositedAssets: "0",
                     },
                     {
                         title: "reverts when assets is too large",
@@ -224,7 +224,7 @@ describe("PerpdexLongToken mint", async () => {
                         aliceQuoteAssets: "1000",
                         mintShares: "0",
                         sendETHValue: "0",
-                        revertedWith: "PL_SD: output is zero",
+                        revertedWith: ": zero amount",
                     },
                     {
                         title: "reverts when assets is too large",
@@ -267,7 +267,11 @@ describe("PerpdexLongToken mint", async () => {
 
                         // assert
                         if (test.revertedWith !== void 0) {
-                            await expect(previewSubject).to.reverted
+                            if (test.mintShares === "0") {
+                                expect(await previewSubject).to.eq(0)
+                            } else {
+                                await expect(previewSubject).to.be.reverted
+                            }
                             await expect(mintSubject).to.revertedWith(test.revertedWith)
                         } else {
                             var depositedAssets = parseAssets(test.depositedAssets)

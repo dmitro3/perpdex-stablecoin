@@ -185,8 +185,8 @@ describe("PerpdexLongToken redeem", async () => {
                         caller: "alice",
                         owner: "alice",
                         receiver: "alice",
-                        revertedWithPreview: "PL_SD: output is zero",
-                        revertedWith: "PL_SD: output is zero'",
+                        withdrawnAssetsPreview: "0",
+                        revertedWith: "VL_W: zero amount'",
                     },
                     {
                         title: "redeem reverts and preview succeeds when shares is more than max",

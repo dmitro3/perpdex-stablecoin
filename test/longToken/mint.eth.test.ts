@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import { PANIC_CODES } from "@nomicfoundation/hardhat-chai-matchers/panic"
 import { expect } from "chai"
 import { Wallet } from "ethers"
 import { parseUnits } from "ethers/lib/utils"
@@ -6,7 +7,6 @@ import { ethers, waffle } from "hardhat"
 import { PerpdexLongToken, TestERC20, TestPerpdexExchange, TestPerpdexMarket } from "../../typechain"
 import { createPerpdexExchangeFixture } from "./fixtures"
 import { initPool } from "./helpers"
-import { PANIC_CODES } from "@nomicfoundation/hardhat-chai-matchers/panic"
 
 describe("PerpdexLongToken mintETH", async () => {
     let loadFixture = waffle.createFixtureLoader(waffle.provider.getWallets())
@@ -91,7 +91,8 @@ describe("PerpdexLongToken mintETH", async () => {
                         aliceQuoteAssets: "1000",
                         mintShares: "0",
                         sendETHValue: "0",
-                        revertedWith: "PL_SD: output is zero",
+                        revertedWith: "VL_DE: zero amount",
+                        skipPreviewSubjectRevertAssert: true,
                     },
                     {
                         title: "reverts when assets is too large",
