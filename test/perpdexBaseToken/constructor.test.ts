@@ -15,8 +15,38 @@ describe("PerpdexTokenBase constructor", async () => {
     }
 
     async function deployPerpdexExchange(settlementTokenAddress) {
+        const accountLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/AccountLibrary.sol:AccountLibrary",
+        )
+        const accountLibrary = await accountLibraryFactory.deploy()
+        const makerOrderBookLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/MakerOrderBookLibrary.sol:MakerOrderBookLibrary",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                },
+            },
+        )
+        const makerOrderBookLibrary = await makerOrderBookLibraryFactory.deploy()
+        const vaultLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/VaultLibrary.sol:VaultLibrary",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                },
+            },
+        )
+        const vaultLibrary = await vaultLibraryFactory.deploy()
+
         var perpdexExchangeFactory = await ethers.getContractFactory(
             "contracts/test/TestPerpdexExchange.sol:TestPerpdexExchange",
+            {
+                libraries: {
+                    AccountLibrary: accountLibrary.address,
+                    MakerOrderBookLibrary: makerOrderBookLibrary.address,
+                    VaultLibrary: vaultLibrary.address,
+                },
+            },
         )
         var perpdexExchange = (await perpdexExchangeFactory.deploy(settlementTokenAddress)) as TestPerpdexExchange
         return perpdexExchange
@@ -30,8 +60,18 @@ describe("PerpdexTokenBase constructor", async () => {
     }
 
     async function deployPerpdexMarket(perpdexExchangeAddress, priceFeedBaseAddress, priceFeedQuoteAddress) {
+        const orderBookLibraryFactory = await ethers.getContractFactory(
+            "deps/perpdex-contract/contracts/lib/OrderBookLibrary.sol:OrderBookLibrary",
+        )
+        const orderBookLibrary = await orderBookLibraryFactory.deploy()
+
         var perpdexMarketFactory = await ethers.getContractFactory(
             "contracts/test/TestPerpdexMarket.sol:TestPerpdexMarket",
+            {
+                libraries: {
+                    OrderBookLibrary: orderBookLibrary.address,
+                },
+            },
         )
         var perpdexMarket = (await perpdexMarketFactory.deploy(
             "USD",
