@@ -8,8 +8,8 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import { Multicall } from "@openzeppelin/contracts/utils/Multicall.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import { PRBMath } from "prb-math/contracts/PRBMath.sol";
 import { FixedPoint96 } from "@uniswap/v3-core/contracts/libraries/FixedPoint96.sol";
 import { IPerpdexExchange } from "../deps/perpdex-contract/contracts/interfaces/IPerpdexExchange.sol";
 import { IPerpdexMarket } from "../deps/perpdex-contract/contracts/interfaces/IPerpdexMarket.sol";
@@ -116,34 +116,34 @@ abstract contract PerpdexTokenBase is IERC4626, ReentrancyGuard, Multicall, ERC2
         uint256 supply = totalSupply();
         if (supply == 0) {
             return
-                PRBMath.mulDiv(
+                Math.mulDiv(
                     _convertToPerpdexDecimals(assets),
                     FixedPoint96.Q96,
                     IPerpdexMarket(market).getShareMarkPriceX96()
                 );
         }
-        return PRBMath.mulDiv(assets, supply, totalAssets());
+        return Math.mulDiv(assets, supply, totalAssets());
     }
 
     function convertToAssets(uint256 shares) public view override returns (uint256 assets) {
         uint256 supply = totalSupply();
         if (supply == 0) {
             return
-                PRBMath.mulDiv(
+                Math.mulDiv(
                     _convertToAssetDecimals(shares),
                     IPerpdexMarket(market).getShareMarkPriceX96(),
                     FixedPoint96.Q96
                 );
         }
-        return PRBMath.mulDiv(shares, totalAssets(), supply);
+        return Math.mulDiv(shares, totalAssets(), supply);
     }
 
     function _convertToPerpdexDecimals(uint256 amount) internal view returns (uint256 assets) {
-        return PRBMath.mulDiv(amount, 10**DECIMALS, 10**IERC20Metadata(asset).decimals());
+        return Math.mulDiv(amount, 10**DECIMALS, 10**IERC20Metadata(asset).decimals());
     }
 
     function _convertToAssetDecimals(uint256 amount) internal view returns (uint256 assets) {
-        return PRBMath.mulDiv(amount, 10**IERC20Metadata(asset).decimals(), 10**DECIMALS);
+        return Math.mulDiv(amount, 10**IERC20Metadata(asset).decimals(), 10**DECIMALS);
     }
 
     function _beforeTrade(
